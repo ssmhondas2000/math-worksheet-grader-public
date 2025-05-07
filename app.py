@@ -73,7 +73,7 @@ if uploaded_file:
     with st.spinner("Grading worksheet..."):
         result_img, score = grade_and_overlay(image)
         st.subheader(f"Score: {score} / 100")
-        st.image(result_img, channels="RGB", use_column_width=True)
+        st.image(result_img, channels="RGB", use_container_width=True)
 
         # Download Button
         st.subheader("Download Graded Worksheet")
