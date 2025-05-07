@@ -4,3 +4,5 @@ pytesseract
 opencv-python
 sympy
 pillow
+libgl1
+libglib2.0-0
