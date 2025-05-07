@@ -1,8 +1,6 @@
 
 streamlit
 pytesseract
-opencv-python
+opencv-python-headless
 sympy
 pillow
-libgl1
-libglib2.0-0
