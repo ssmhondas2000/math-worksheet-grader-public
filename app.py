@@ -7,12 +7,12 @@ from sympy import sympify
 from PIL import Image
 from io import BytesIO
 
+# Normalize OCR results and compare math expressions more flexibly
 def parse_equation(text):
+    text = text.replace(' ', '')  # Remove all whitespace
     if '=' in text:
-        left, right = text.split('=')
-        expr = left.strip()
-        student_answer = right.strip()
-        return expr, student_answer
+        left, right = text.split('=', 1)
+        return left.strip(), right.strip()
     return text.strip(), None
 
 def solve_expression(expr):
@@ -22,24 +22,29 @@ def solve_expression(expr):
     except Exception:
         return None
 
+def is_answer_correct(expected, student_answer):
+    try:
+        return sympify(expected) == sympify(student_answer)
+    except Exception:
+        return False
+
 def grade_and_overlay(image_pil):
     image_cv = np.array(image_pil.convert('RGB'))
     results_img = image_cv.copy()
     data = pytesseract.image_to_data(image_cv, config='--psm 6', output_type=pytesseract.Output.DICT)
-    
+
     n_boxes = len(data['level'])
     total = 0
     correct = 0
 
     for i in range(n_boxes):
-        text = data['text'][i].strip()
-        if any(c.isdigit() for c in text) and '=' in text:
+        text = data['text'][i].strip().replace(' ', '')
+        if '=' in text and any(c.isdigit() for c in text):
             expr, student_answer = parse_equation(text)
             expected = solve_expression(expr)
-            if expected is not None:
+            if expected is not None and student_answer is not None:
                 total += 1
-                is_correct = expected == student_answer
-                if is_correct:
+                if is_answer_correct(expected, student_answer):
                     correct += 1
                     color = (0, 180, 0)
                     tag = "✓"
