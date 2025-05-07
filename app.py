@@ -68,7 +68,7 @@ uploaded_file = st.file_uploader("Upload a worksheet image (JPG/PNG)", type=["jp
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Original Worksheet", use_column_width=True)
+    st.image(image, caption="Original Worksheet", use_container_width=True)
 
     with st.spinner("Grading worksheet..."):
         result_img, score = grade_and_overlay(image)
