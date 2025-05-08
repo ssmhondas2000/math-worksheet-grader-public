@@ -8,15 +8,6 @@ from PIL import Image
 from io import BytesIO
 import logging
 
-<<<<<<< HEAD
-# Setup logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler("debug.log"), logging.StreamHandler()]
-)
-
-<<<<<<< HEAD
 # Clean up common OCR mistakes
 def clean_ocr_text(text):
     logging.debug(f"Raw OCR text before cleanup: {text}")
@@ -31,12 +22,7 @@ def clean_ocr_text(text):
     logging.debug(f"OCR text after cleanup: {text}")
     return text
 
-=======
 # Normalize OCR results and compare math expressions more flexibly
->>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
-=======
-# Normalize OCR results and compare math expressions more flexibly
->>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
 def parse_equation(text):
     text = text.replace(' ', '')  # Remove all whitespace
     if '=' in text:
@@ -88,15 +74,8 @@ def grade_and_overlay(image_pil):
                 x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
                 cv2.putText(results_img, tag, (x + w + 10, y + h - 5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
-
-<<<<<<< HEAD
-<<<<<<< HEAD
                 logging.info(f"OCR: '{raw_text}' → Expr: '{expr}' | Student: '{student_answer}' | Expected: '{expected}' | Match: {match}")
 
-=======
->>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
-=======
->>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
     score = int((correct / total) * 100) if total > 0 else 0
     logging.info(f"Grading complete. Score: {score} / 100")
     return results_img, score
