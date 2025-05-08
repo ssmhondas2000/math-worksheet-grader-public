@@ -27,10 +27,19 @@ def parse_equation(text):
         return question, answer
     return None, None
 
-def extract_questions(image):
+def preprocess_image(image):
     img_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    ocr_data = pytesseract.image_to_data(img_cv, output_type=pytesseract.Output.DICT)
-    ocr_text_raw = pytesseract.image_to_string(img_cv)
+    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    return thresh
+    
+def extract_questions(image):
+    preprocessed = preprocess_image(image)
+    
+    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789+-=xX*/'
+    
+    ocr_data = pytesseract.image_to_data(preprocessed, output_type=pytesseract.Output.DICT, config=custom_config)
+    ocr_text_raw = pytesseract.image_to_string(preprocessed, config=custom_config)
 
     found_items = []
     for i in range(len(ocr_data["text"])):
@@ -40,11 +49,11 @@ def extract_questions(image):
             if question:
                 found_items.append({
                     "text": text,
-                    "question": question,
+                    "question": question.replace('X', 'x'),
                     "user_answer": user_answer,
                     "box": (ocr_data["left"][i], ocr_data["top"][i], ocr_data["width"][i], ocr_data["height"][i])
                 })
-    return img_cv, found_items, ocr_text_raw
+    return preprocessed, found_items, ocr_text_raw
 
 def grade_answers(answer_list):
     graded = []
