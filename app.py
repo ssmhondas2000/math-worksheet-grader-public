@@ -1,4 +1,4 @@
-# math_checker_app_extended.py
+# math_checker_app_with_ocr_preview.py
 import streamlit as st
 import pytesseract
 import cv2
@@ -10,7 +10,6 @@ import io
 # Optional: set Tesseract path
 # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-# Correct answers dictionary
 correct_answers = {
     "1 + 1": "2",
     "2 + 2": "4",
@@ -30,12 +29,12 @@ def parse_equation(text):
 
 def extract_questions(image):
     img_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    results = pytesseract.image_to_data(img_cv, output_type=pytesseract.Output.DICT)
+    ocr_data = pytesseract.image_to_data(img_cv, output_type=pytesseract.Output.DICT)
+    ocr_text_raw = pytesseract.image_to_string(img_cv)
 
     found_items = []
-
-    for i in range(len(results["text"])):
-        text = results["text"][i].strip()
+    for i in range(len(ocr_data["text"])):
+        text = ocr_data["text"][i].strip()
         if "=" in text:
             question, user_answer = parse_equation(text)
             if question:
@@ -43,14 +42,13 @@ def extract_questions(image):
                     "text": text,
                     "question": question,
                     "user_answer": user_answer,
-                    "box": (results["left"][i], results["top"][i], results["width"][i], results["height"][i])
+                    "box": (ocr_data["left"][i], ocr_data["top"][i], ocr_data["width"][i], ocr_data["height"][i])
                 })
-    return img_cv, found_items
+    return img_cv, found_items, ocr_text_raw
 
 def grade_answers(answer_list):
     graded = []
     correct = 0
-
     for item in answer_list:
         question = item["question"]
         user_answer = item["user_answer"]
@@ -59,7 +57,6 @@ def grade_answers(answer_list):
         graded.append({**item, "is_correct": is_correct, "correct_answer": correct_answer})
         if is_correct:
             correct += 1
-
     percent = (correct / len(graded)) * 100 if graded else 0
     return graded, percent
 
@@ -70,7 +67,7 @@ def draw_boxes(img, graded_answers):
         cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
     return img
 
-# Streamlit App UI
+# Streamlit UI
 st.title("📄 Math Worksheet Grader")
 uploaded_file = st.file_uploader("Upload worksheet image", type=["jpg", "jpeg", "png"])
 
@@ -79,14 +76,18 @@ if uploaded_file:
     st.image(image, caption="Uploaded Worksheet", use_container_width=True)
 
     with st.spinner("Reading and grading answers..."):
-        img_cv, found_items = extract_questions(image)
+        img_cv, found_items, ocr_text_raw = extract_questions(image)
         graded_list, score = grade_answers(found_items)
 
     st.markdown(f"### 🧮 Grade: **{score:.2f}%**")
 
+    # ✅ OCR Detected Raw Text
+    with st.expander("📄 See OCR Detected Text"):
+        st.text(ocr_text_raw)
+
+    # ✅ Manual Review
     st.markdown("### ✏️ Review and Edit Answers")
     updated_items = []
-
     for idx, item in enumerate(graded_list):
         st.markdown(f"**Q{idx + 1}: {item['question']} = ?**")
         updated_answer = st.text_input("Your Answer", value=item["user_answer"], key=f"answer_{idx}")
@@ -96,11 +97,12 @@ if uploaded_file:
         graded_list, score = grade_answers(updated_items)
         img_cv = draw_boxes(img_cv, graded_list)
         st.markdown(f"### 🔁 Updated Grade: **{score:.2f}%**")
-        st.image(cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB), caption="Graded Worksheet", use_container_width=True)
 
-    st.markdown("---")
+    # ✅ Display Graded Image
+    st.image(cv2.cvtColor(draw_boxes(img_cv, graded_list), cv2.COLOR_BGR2RGB), caption="Graded Worksheet", use_container_width=True)
+
+    # ✅ Download Results
     st.markdown("### 💾 Download Results")
-
     result_text = f"Math Worksheet Grading Results\nScore: {score:.2f}%\n\n"
     for i, item in enumerate(graded_list):
         status = "✅ Correct" if item["is_correct"] else "❌ Incorrect"
