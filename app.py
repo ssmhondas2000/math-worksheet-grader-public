@@ -86,6 +86,8 @@ st.title("Graded Math Worksheet Solver")
 
 uploaded_file = st.file_uploader("Upload a worksheet image (JPG/PNG)", type=["jpg", "jpeg", "png"])
 
+print("Hello, my name is %s and I am %d years old." % (name, age))
+
 if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, caption="Original Worksheet", use_container_width=True)
