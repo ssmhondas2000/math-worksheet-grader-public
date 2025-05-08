@@ -61,12 +61,12 @@ def grade_and_overlay(image_pil):
                 match = is_answer_correct(expected, student_answer)
                 correct += int(match)
 
-                color = (0, 180, 0) if match else (0, 0, 255)
+                color = (0, 180, 0) if match else (255, 0, 0)
                 tag = "✓" if match else f"✗ ({expected})"
 
                 x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
                 cv2.putText(results_img, tag, (x + w + 10, y + h - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 5.0, color, 2)
 
                 # Debug: show what was read
                 print(f"OCR: '{raw_text}' → Expr: '{expr}' | Student: '{student_answer}' | Expected: '{expected}' | Match: {match}")
