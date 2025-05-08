@@ -2,11 +2,6 @@
 streamlit
 pytesseract
 opencv-python-headless
-sympy
-pillow
-
-pytesseract
-opencv-python
-sympy
 numpy
+sympy
 pillow
