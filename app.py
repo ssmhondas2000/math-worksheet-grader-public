@@ -10,7 +10,6 @@ import re
 # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 # Sample correct answers
-# Format: question (as seen in OCR) -> correct answer
 correct_answers = {
     "1 + 1": "2",
     "2 + 2": "4",
@@ -21,7 +20,6 @@ correct_answers = {
 }
 
 def parse_equation(text):
-    """Extracts question and answer from OCR text like '1 + 1 = 2'"""
     match = re.match(r'(.+?)\s*=\s*(.+)', text)
     if match:
         question = match.group(1).strip()
@@ -45,9 +43,9 @@ def grade_image(image):
                 total += 1
                 if is_correct:
                     correct += 1
-                    color = (0, 255, 0)  # Green for correct
+                    color = (0, 255, 0)  # Green
                 else:
-                    color = (0, 0, 255)  # Red for incorrect
+                    color = (0, 0, 255)  # Red
 
                 (x, y, w, h) = (results["left"][i], results["top"][i], results["width"][i], results["height"][i])
                 cv2.rectangle(img_cv, (x, y), (x + w, y + h), color, 2)
@@ -61,10 +59,10 @@ uploaded_file = st.file_uploader("Upload worksheet image", type=["jpg", "png", "
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Worksheet", use_column_width=True)
+    st.image(image, caption="Uploaded Worksheet", use_container_width=True)
 
     with st.spinner("Grading..."):
         graded_img, score = grade_image(image)
 
     st.markdown(f"### 🧮 Grade: **{score:.2f}%**")
-    st.image(cv2.cvtColor(graded_img, cv2.COLOR_BGR2RGB), caption="Graded Worksheet", use_column_width=True)
+    st.image(cv2.cvtColor(graded_img, cv2.COLOR_BGR2RGB), caption="Graded Worksheet", use_container_width=True)
