@@ -15,6 +15,7 @@ logging.basicConfig(
     handlers=[logging.FileHandler("debug.log"), logging.StreamHandler()]
 )
 
+<<<<<<< HEAD
 # Clean up common OCR mistakes
 def clean_ocr_text(text):
     logging.debug(f"Raw OCR text before cleanup: {text}")
@@ -29,9 +30,11 @@ def clean_ocr_text(text):
     logging.debug(f"OCR text after cleanup: {text}")
     return text
 
+=======
+# Normalize OCR results and compare math expressions more flexibly
+>>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
 def parse_equation(text):
-    text = text.replace(' ', '')
-    text = clean_ocr_text(text)
+    text = text.replace(' ', '')  # Remove all whitespace
     if '=' in text:
         left, right = text.split('=', 1)
         return left.strip(), right.strip()
@@ -63,27 +66,30 @@ def grade_and_overlay(image_pil):
     correct = 0
 
     for i in range(n_boxes):
-        raw_text = data['text'][i].strip()
-        text = clean_ocr_text(raw_text.replace(' ', ''))
-
+        text = data['text'][i].strip().replace(' ', '')
         if '=' in text and any(c.isdigit() for c in text):
             logging.debug(f"Equation found: {text}")
             expr, student_answer = parse_equation(text)
             expected = solve_expression(expr)
-            if expected and student_answer:
+            if expected is not None and student_answer is not None:
                 total += 1
-                match = is_answer_correct(expected, student_answer)
-                correct += int(match)
-
-                color = (0, 180, 0) if match else (0, 0, 255)
-                tag = "✓" if match else f"✗ ({expected})"
+                if is_answer_correct(expected, student_answer):
+                    correct += 1
+                    color = (0, 180, 0)
+                    tag = "✓"
+                else:
+                    color = (0, 0, 255)
+                    tag = f"✗ ({expected})"
 
                 x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
                 cv2.putText(results_img, tag, (x + w + 10, y + h - 5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
+<<<<<<< HEAD
                 logging.info(f"OCR: '{raw_text}' → Expr: '{expr}' | Student: '{student_answer}' | Expected: '{expected}' | Match: {match}")
 
+=======
+>>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
     score = int((correct / total) * 100) if total > 0 else 0
     logging.info(f"Grading complete. Score: {score} / 100")
     return results_img, score
@@ -109,6 +115,7 @@ if uploaded_file:
         st.subheader(f"Score: {score} / 100")
         st.image(result_img, channels="RGB", use_container_width=True)
 
+        # Download Button
         st.subheader("Download Graded Worksheet")
         downloadable = convert_to_downloadable(result_img)
         st.download_button("Download Image", downloadable, file_name="graded_worksheet.png", mime="image/png")
