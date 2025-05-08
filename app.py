@@ -66,7 +66,7 @@ def grade_and_overlay(image_pil):
 
                 x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
                 cv2.putText(results_img, tag, (x + w + 10, y + h - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 5.0, color, 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 2.0, color, 4)
 
                 # Debug: show what was read
                 print(f"OCR: '{raw_text}' → Expr: '{expr}' | Student: '{student_answer}' | Expected: '{expected}' | Match: {match}")
