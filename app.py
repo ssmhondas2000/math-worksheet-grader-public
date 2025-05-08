@@ -8,6 +8,7 @@ from PIL import Image
 from io import BytesIO
 import logging
 
+<<<<<<< HEAD
 # Setup logging
 logging.basicConfig(
     level=logging.DEBUG,
@@ -30,6 +31,9 @@ def clean_ocr_text(text):
     logging.debug(f"OCR text after cleanup: {text}")
     return text
 
+=======
+# Normalize OCR results and compare math expressions more flexibly
+>>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
 =======
 # Normalize OCR results and compare math expressions more flexibly
 >>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
@@ -86,8 +90,11 @@ def grade_and_overlay(image_pil):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                 logging.info(f"OCR: '{raw_text}' → Expr: '{expr}' | Student: '{student_answer}' | Expected: '{expected}' | Match: {match}")
 
+=======
+>>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
 =======
 >>>>>>> parent of a4bf5a5 (still troubleshooting OCR issues)
     score = int((correct / total) * 100) if total > 0 else 0
