@@ -43,7 +43,7 @@ def is_answer_correct(expected, student_answer):
 def grade_and_overlay(image_pil):
     image_cv = np.array(image_pil.convert('RGB'))
     results_img = image_cv.copy()
-    data = pytesseract.image_to_data(image_cv, config='--psm 7', output_type=pytesseract.Output.DICT)
+    data = pytesseract.image_to_data(image_cv, config='--psm 8', output_type=pytesseract.Output.DICT)
 
     n_boxes = len(data['level'])
     total = 0
